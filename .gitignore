@@ -1,3 +1,12 @@
+# MSCOCO data
+/research/im2txt/im2txt/data/mscoco/
+
+# Inception_v3 checkpoint, used in the 0th step for show and tell model training
+/research/im2txt/im2txt/data/inception_v3.ckpt
+
+#Directory to save show and tell model
+/research/im2txt/im2txt/model/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
