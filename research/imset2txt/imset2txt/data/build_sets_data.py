@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Converts MSCOCO data to TFRecord file format with SequenceExample protos.
+"""Converts PlaceSets data to TFRecord file format with SequenceExample protos.
+
+Image Sets are from the folder:
+/local-scratch2/ajakash/aabdujyo/2017_set_compression/Data/Parks
+
+Annotations are found in :
+/local-scratch2/ajakash/aabdujyo/2017_set_compression/Data/annotations_hive/annotatoins_set1_541.csv
 
 The MSCOCO images are expected to reside in JPEG files located in the following
 directory structure:
@@ -99,15 +105,12 @@ import nltk.tokenize
 import numpy as np
 import tensorflow as tf
 
-tf.flags.DEFINE_string("train_image_dir", "/tmp/train2014/",
-                       "Training image directory.")
-tf.flags.DEFINE_string("val_image_dir", "/tmp/val2014",
-                       "Validation image directory.")
-
-tf.flags.DEFINE_string("train_captions_file", "/tmp/captions_train2014.json",
-                       "Training captions JSON file.")
-tf.flags.DEFINE_string("val_captions_file", "/tmp/captions_val2014.json",
-                       "Validation captions JSON file.")
+tf.flags.DEFINE_string("image_dir", "/local-scratch2/ajakash/aabdujyo/2017_set_compression/Data/Parks/",
+                       "Image directory for 2500 sets from Parks.")
+tf.flags.DEFINE_string("annotation_file",
+                       "//local-scratch2/ajakash/aabdujyo/2017_set_compression/Data"
+                       "/annotations_hive/annotatoins_set1_541.csv",
+                       "Annotations for 541 samples.")
 
 tf.flags.DEFINE_string("output_dir", "/tmp/", "Output data directory.")
 
@@ -120,8 +123,10 @@ tf.flags.DEFINE_integer("test_shards", 8,
 
 tf.flags.DEFINE_string("start_word", "<S>",
                        "Special word added to the beginning of each sentence.")
+tf.flags.DEFINE_string("middle_end_word", "<M>",
+                       "Special word added to the end of each sentence that is not the last sentence.")
 tf.flags.DEFINE_string("end_word", "</S>",
-                       "Special word added to the end of each sentence.")
+                       "Special word added to the end of last sentence in the description.")
 tf.flags.DEFINE_string("unknown_word", "<UNK>",
                        "Special word meaning 'unknown'.")
 tf.flags.DEFINE_integer("min_word_count", 4,
@@ -135,9 +140,8 @@ tf.flags.DEFINE_integer("num_threads", 8,
 
 FLAGS = tf.flags.FLAGS
 
-ImageMetadata = namedtuple("ImageMetadata",
-                           ["image_id", "filename", "captions"])
-
+ImageSetMetadata = namedtuple("ImageSetMetadata",
+                           ["image_set_name", "filename", "captions"])
 
 class Vocabulary(object):
   """Simple vocabulary wrapper."""
@@ -213,12 +217,13 @@ def _to_sequence_example(image, decoder, vocab):
   with tf.gfile.FastGFile(image.filename, "r") as f:
     encoded_image = f.read()
 
-  try:
+  try: # try this for all images in the full dataset. Also need to crop panoramic images here or later?
     decoder.decode_jpeg(encoded_image)
   except (tf.errors.InvalidArgumentError, AssertionError):
     print("Skipping file with invalid JPEG data: %s" % image.filename)
     return
 
+  # Add all images from the set here?
   context = tf.train.Features(feature={
       "image/image_id": _int64_feature(image.image_id),
       "image/data": _bytes_feature(encoded_image),
