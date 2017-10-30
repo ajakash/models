@@ -1,5 +1,5 @@
 # Places Sets data
-/research/imset2txt/imset2txt/data/PlaceSets/
+/research/imset2txt/imset2txt/data/*/
 /research/imset2txt/imset2txt/data/inception_v3.ckpt
 
 # MSCOCO data
