@@ -36,8 +36,8 @@ tf.flags.DEFINE_string("checkpoint_path", "",
                        "model checkpoint file.")
 tf.flags.DEFINE_string("vocab_file", "", "Text file containing the vocabulary.")
 tf.flags.DEFINE_string("input_files", "",
-                       "File pattern or comma-separated list of file patterns "
-                       "of image files.")
+                       "Folder name pattern or comma-separated list of folder "
+                       "name patterns of image-set folders.")
 
 tf.logging.set_verbosity(tf.logging.INFO)
 

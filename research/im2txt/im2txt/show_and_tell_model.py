@@ -26,6 +26,8 @@ from __future__ import print_function
 
 import tensorflow as tf
 
+import tensorflow_fold as td
+
 from im2txt.ops import image_embedding
 from im2txt.ops import image_processing
 from im2txt.ops import inputs as input_ops
