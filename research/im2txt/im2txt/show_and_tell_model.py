@@ -26,7 +26,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 
-import tensorflow_fold as td
+#import tensorflow_fold as td
 
 from im2txt.ops import image_embedding
 from im2txt.ops import image_processing
@@ -139,6 +139,7 @@ class ShowAndTellModel(object):
       # Process image and insert batch dimensions.
       images = tf.expand_dims(self.process_image(image_feed), 0)
       input_seqs = tf.expand_dims(input_feed, 1)
+      tf.Print(input_seqs, [input_seqs, tf.shape(input_seqs), "This is a furball"])
 
       # No target sequences or input mask in inference mode.
       target_seqs = None
@@ -174,6 +175,7 @@ class ShowAndTellModel(object):
           input_ops.batch_with_dynamic_pad(images_and_captions,
                                            batch_size=self.config.batch_size,
                                            queue_capacity=queue_capacity))
+      tf.Print(input_seqs, [input_seqs, tf.shape(input_seqs), "This is a furball"])
 
     self.images = images
     self.input_seqs = input_seqs

@@ -35,7 +35,7 @@ tf.flags.DEFINE_string("checkpoint_path", "",
                        "Model checkpoint file or directory containing a "
                        "model checkpoint file.")
 tf.flags.DEFINE_string("vocab_file", "", "Text file containing the vocabulary.")
-tf.flags.DEFINE_string("input_files", "",
+tf.flags.DEFINE_string("input_folders", "",
                        "Folder name pattern or comma-separated list of folder "
                        "name patterns of image-set folders.")
 
@@ -54,11 +54,11 @@ def main(_):
   # Create the vocabulary.
   vocab = vocabulary.Vocabulary(FLAGS.vocab_file)
 
-  filenames = []
-  for file_pattern in FLAGS.input_files.split(","):
-    filenames.extend(tf.gfile.Glob(file_pattern))
-  tf.logging.info("Running caption generation on %d files matching %s",
-                  len(filenames), FLAGS.input_files)
+  foldernames = []
+  for file_pattern in FLAGS.input_folders.split(","):
+    foldernames.extend(tf.gfile.Glob(file_pattern))
+  tf.logging.info("Running caption generation on %d image set folders matching %s",
+                  len(foldernames), FLAGS.input_folders)
 
   with tf.Session(graph=g) as sess:
     # Load the model from checkpoint.
@@ -69,11 +69,11 @@ def main(_):
     # available beam search parameters.
     generator = caption_generator.CaptionGenerator(model, vocab)
 
-    for filename in filenames:
-      with tf.gfile.GFile(filename, "r") as f:
+    for foldername in foldernames:
+      with tf.gfile.GFile(foldername, "r") as f:
         image = f.read()
       captions = generator.beam_search(sess, image)
-      print("Captions for image %s:" % os.path.basename(filename))
+      print("Captions for image %s:" % os.path.basename(foldername))
       for i, caption in enumerate(captions):
         # Ignore begin and end words.
         sentence = [vocab.id_to_word(w) for w in caption.sentence[1:-1]]
